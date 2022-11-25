@@ -1,6 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const body_parser = require("body-parser")
+const serviceReserva = require("./ReservaService.js")
 
 const app = express()
 const path =  "/reservas"
@@ -10,18 +11,25 @@ app.use(cors())
 app.use(body_parser.json())
 
 app.get(path ,
-    (request, response)=>{
+    async (request, response)=>{
         console.log("llego peticion")
-        console.log(request)
+        id_client= request.query.id_client
+        response.send(await serviceReserva.getReservas(id_client))
+    }
+)
 
-        response.send("Hola mundo")
+app.post(path,
+    
+    async (request, response)=>{
+        let reserva = request.body
+        response.send(await serviceReserva.reservas(reserva))
     }
 )
 
 
 app.listen(portreserva,
     ()=>{
-        console.log("Subio api vuelo en el puerto"+port)
+        console.log("Subio api reserva en el puerto "+portreserva)
     }
 )
 
