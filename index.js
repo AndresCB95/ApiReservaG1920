@@ -26,6 +26,13 @@ app.post(path,
     }
 )
 
+app.patch(path,
+    async (request, response)=>{
+        const estado_pago = request.body
+        response.send(await serviceReserva.cambioEstado(estado_pago))
+    }
+)
+
 
 app.listen(portreserva,
     ()=>{

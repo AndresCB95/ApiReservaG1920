@@ -1,5 +1,6 @@
 const mongoReservas = require("./mongodbreserva.js")
 const request = require("axios")
+const ObjectId = require("mongodb").ObjectId
 
 /*
 MODELO RESERVA BD
@@ -53,7 +54,7 @@ const reservas = async (reserva_api)=>{
     }
 
     await request.patch(
-        "http://localhost:8081/vuelos",reserva_api
+        "http://192.168.1.7:8081/vuelos",reserva_api
     )
     .then(
         async (response)=>{
@@ -73,8 +74,7 @@ const reservas = async (reserva_api)=>{
     const reserva_bd = await mongoReservas.findOne(collection,filtro)
 
     mongoReservas.close(client)
-    return reserva_bd
-        
+    return reserva_bd        
 }
 
 const getReservas = async (id_client)=>{
@@ -88,6 +88,19 @@ const getReservas = async (id_client)=>{
 
 }
 
+const cambioEstado = async (estado_pago)=>{
+
+    const client = await mongoReservas.getClient()
+    const collection = await mongoReservas.getCollection(client)  
+    const filtro = {"_id":new ObjectId(estado_pago.id_reserva),"estado_reserva":"pendiente"}
+    const update = {"$set":{"estado_reserva":estado_pago.estado_pago}}
+    await mongoReservas.updatereserva(collection,filtro,update)
+    const reserva = await mongoReservas.findOne(collection,{"_id":estado_pago.id_reserva})
+    mongoReservas.close(client)
+    return reserva
+}
+
 
 module.exports.reservas = reservas
 module.exports.getReservas = getReservas
+module.exports.cambioEstado = cambioEstado
